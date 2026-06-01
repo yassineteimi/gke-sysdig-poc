@@ -53,9 +53,6 @@ extra:
     - icon: fontawesome/brands/linkedin
       link: https://linkedin.com/in/yassine-teimi
 
-extra_javascript:
-  - https://polyfill.io/v3/polyfill.min.js
-
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
