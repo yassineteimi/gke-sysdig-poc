@@ -22,7 +22,7 @@ again.
 
 Here's the process for making a change to this repository:
 
-1. Review Online Boutique's [purpose](/docs/purpose.md) and [product requirements](/docs/product-requirements.md).
+1. Review Online Boutique's [purpose](/docs-archive/purpose.md) and [product requirements](/docs-archive/product-requirements.md).
 1. If your proposed changes **do not align** with the purpose and product requirements of Online Boutique, you may be asked to instead maintain your own fork of this repository.
 1. For **small changes** (such as a bug fixes or spelling corrections):
     1. Fork this repository and submit a [pull request](https://help.github.com/articles/about-pull-requests/).

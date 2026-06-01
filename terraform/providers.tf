@@ -18,10 +18,36 @@ terraform {
       source  = "hashicorp/google"
       version = "4.70.0"
     }
+    google-beta = {
+      version = "4.71.0"
+    }
+    sysdig = {
+      source = "sysdiglabs/sysdig"
+    }
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+    }
   }
+  required_version = ">= 0.13"
+}
+
+provider "kubernetes" {
+  host                   = "https://${module.gke.endpoint}"
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(module.gke.ca_certificate)
+}
+
+provider "sysdig" {
+  sysdig_secure_url       = "https://eu1.app.sysdig.com"
+  sysdig_secure_api_token = var.sysdig_secure_api_token
 }
 
 provider "google" {
-  project = var.gcp_project_id
+  project = var.project_id
+  region  = var.region
+}
+
+provider "google-beta" {
+  project = var.project_id
   region  = var.region
 }

@@ -23,7 +23,7 @@ resource "google_redis_instance" "redis-cart" {
   count          = var.memorystore ? 1 : 0
 
   redis_version  = "REDIS_6_X"
-  project        = var.gcp_project_id
+  project        = var.project_id
 
   depends_on = [
     module.enable_google_apis

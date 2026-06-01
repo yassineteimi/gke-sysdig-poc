@@ -17,4 +17,56 @@ pkg/
 .terraform/*
 .terraform.lock.hcl
 *.tfvars
+*.tfvars.json
 release/wi-kubernetes-manifests.yaml
+
+# --- Secrets / credentials (added before public release) ---
+# Terraform state can contain tokens, certs, and IPs
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# GCP service-account keys & generic credential files
+**/creds.json
+**/credentials.json
+*-key.json
+*serviceaccount*.json
+*service-account*.json
+*gcp*key*.json
+.deploystack/creds.json
+
+# Private keys / certs
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# Kubeconfig / cluster auth
+kubeconfig
+*kubeconfig*
+.kube/
+
+# Env files
+.env
+.env.*
+*.env
+
+# Local CLI binaries accidentally vendored into the repo
+terraform/kubectl
+
+# Sysdig API scan outputs (may contain infra/vuln details) and scripts with tokens
+sysdig_api/*.json
+
+# OS cruft
+**/.DS_Store

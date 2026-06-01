@@ -1,0 +1,80 @@
+site_name: GKE on GCP — Terraform + Sysdig PoC
+
+nav:
+  - Overview: index.md
+  - Architecture: architecture.md
+  - Deployment: deployment.md
+  - Security & Observability: security.md
+
+site_author: Yassine TEIMI
+site_description: >-
+  A GKE-on-GCP proof of concept provisioned end-to-end with Terraform and
+  secured/observed with Sysdig: IAM, network policy, runtime threat detection
+  and image vulnerability scanning.
+
+repo_name: yassineteimi/gke-sysdig-poc
+repo_url: https://github.com/yassineteimi/gke-sysdig-poc
+
+# Upstream release tooling kept in the repo but excluded from the docs site
+exclude_docs: |
+  releasing/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  language: en
+  palette:
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+      primary: teal
+      accent: lime
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+      primary: teal
+      accent: purple
+
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/yassineteimi
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/in/yassine-teimi
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.mark
+
+plugins:
+  - search
+
+copyright: |
+  &copy; 2024 <a href="https://github.com/yassineteimi" target="_blank" rel="noopener">Yassine TEIMI</a>

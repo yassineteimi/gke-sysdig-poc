@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+data "google_client_config" "default" {}
+
 # Definition of local variables
 locals {
   base_apis = [
@@ -21,7 +23,7 @@ locals {
     "cloudprofiler.googleapis.com"
   ]
   memorystore_apis = ["redis.googleapis.com"]
-  cluster_name     = google_container_cluster.my_cluster.name
+  cluster_name     = module.gke.name
 }
 
 # Enable Google Cloud APIs
@@ -29,28 +31,68 @@ module "enable_google_apis" {
   source  = "terraform-google-modules/project-factory/google//modules/project_services"
   version = "~> 14.0"
 
-  project_id                  = var.gcp_project_id
+  project_id                  = var.project_id
   disable_services_on_destroy = false
 
   # activate_apis is the set of base_apis and the APIs required by user-configured deployment options
   activate_apis = concat(local.base_apis, var.memorystore ? local.memorystore_apis : [])
 }
 
-# Create GKE cluster
-resource "google_container_cluster" "my_cluster" {
+module "gcp-network" {
+  source  = "terraform-google-modules/network/google"
+  version = ">= 4.0.1"
 
-  name     = var.name
-  location = var.region
+  project_id   = var.project_id
+  network_name = var.network
 
-  # Enabling autopilot for this cluster
-  enable_autopilot = true
+  subnets = [
+    {
+      subnet_name   = var.subnetwork
+      subnet_ip     = "10.50.0.0/16"
+      subnet_region = var.region
+    },
+  ]
 
-  # Setting an empty ip_allocation_policy to allow autopilot cluster to spin up correctly
-  ip_allocation_policy {
+  secondary_ranges = {
+    (var.subnetwork) = [
+      {
+        range_name    = var.ip_range_pods_name
+        ip_cidr_range = "192.168.0.0/18"
+      },
+      {
+        range_name    = var.ip_range_services_name
+        ip_cidr_range = "192.168.64.0/18"
+      },
+    ]
   }
+}
 
-  depends_on = [
-    module.enable_google_apis
+# Create GKE cluster
+
+module "gke" {
+  source                 = "terraform-google-modules/kubernetes-engine/google"
+  project_id             = var.project_id
+  name                   = var.cluster_name
+  regional               = true
+  region                 = var.region
+  zones                  = var.zones
+  network                = module.gcp-network.network_name
+  subnetwork             = module.gcp-network.subnets_names[0]
+  ip_range_pods          = var.ip_range_pods_name
+  ip_range_services      = var.ip_range_services_name
+  create_service_account = true
+  remove_default_node_pool = true
+  node_pools = [
+    {
+      name               = "sysdig-node-pool"
+      enable_autoscaling = false
+      machine_type       = "e2-standard-4"
+      min_count          = 1
+      max_count          = 3
+      node_count         = 3
+      disk_size_gb       = 30
+      disk_type          = "pd-standard"
+    }
   ]
 }
 
@@ -65,7 +107,16 @@ module "gcloud" {
   create_cmd_entrypoint = "gcloud"
   # Module does not support explicit dependency
   # Enforce implicit dependency through use of local variable
-  create_cmd_body = "container clusters get-credentials ${local.cluster_name} --zone=${var.region} --project=${var.gcp_project_id}"
+  create_cmd_body = "container clusters get-credentials ${local.cluster_name} --zone=${var.region} --project=${var.project_id}"
+}
+
+# Create the sysdig namespace
+resource "kubernetes_namespace" "sysdigtest" {
+  depends_on = [module.gcloud]
+
+  metadata {
+    name = "sysdigtest"
+  }
 }
 
 # Apply YAML kubernetes-manifest configurations
@@ -94,3 +145,7 @@ resource "null_resource" "wait_conditions" {
     resource.null_resource.apply_deployment
   ]
 }
+
+# module "single-project" {
+#   source = "sysdiglabs/secure-for-cloud/google//examples/single-project"
+# }
