@@ -70,3 +70,6 @@ sysdig_api/*.json
 
 # OS cruft
 **/.DS_Store
+
+# MkDocs build output
+site/
